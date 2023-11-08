@@ -1,0 +1,559 @@
+---
+title: "New Plots"
+author: "Elvira Fleury"
+date: "5/15/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(reshape2)
+library(haven)
+library(tableone)
+library(knitr)
+library(ggvenn)
+```
+
+Table One 
+
+```{r tab_one_pfas}
+#read in a slightly different version of covariates that includes the categorical format of some variables 
+#this makes the table one more understandable 
+#dimensions: 389* 74 
+full_cov_pfas<- read.csv("pfas_elvira_389 copy.csv") 
+#read in my version so that we can get the right format for some vars
+#dimensions: 389* 74 
+
+#you need to have the "pfas" file loaded from the MWAS.Rmd File. 
+#this file is 2674* 34. 
+
+#only keep participants who are in analysis 
+full_cov_pfas<- full_cov_pfas%>%
+  filter(participant_id %in% pfas$participant_ID)
+
+#getting maternal race info from pfas file 
+pfas_mom<- pfas%>%
+  select(participant_ID, mom_race)
+pfas_mom$participant_ID<-as.numeric(pfas_mom$participant_ID) #make participant ID numeric 
+#add it to full covariate df 
+pfas_full <- left_join(full_cov_pfas, pfas_mom, by = c("participant_id" = "participant_ID"))
+
+#factor variables 
+pfas_full$smk<- as.factor(pfas_full$smk)
+pfas_full$midincome_cat<- as.factor(pfas_full$midincome_cat)
+pfas_full$child_sex<- as.factor(pfas_full$child_sex)
+pfas_full$mom_race<- as.factor(pfas_full$mom_race)
+
+#define factor variables and variables of interest 
+vars_of_interest<- c("mom_race" , "momagedeliv" , "smk" , "midincome_cat", "child_sex")
+factor_columns<- c("mom_race", "child_sex", "midincome_cat", "smk")
+
+#create table 1
+pfas_tab_one<- CreateTableOne(vars= vars_of_interest, factorVars = factor_columns, data=pfas_full)
+
+#get table one in correct format for easy copy and paste to excel
+pfas_tab_one_df <- print(heart_tab_one, quote = FALSE, noSpaces = TRUE)
+kable(heart_tab_one_df)
+```
+
+**4 PFAS Mixture to metabolic features- Volcano Plot**
+Significant line: -log10(#sig.features/tot.features* 0.2)
+
+ORGIGINAL PFAS MIXTURE MWAS 
+
+```{r four_pfas_mwas}
+# VOLCANO PLOT FOR OG MIXTURE 
+full_qg<- read.csv('QG_comp_full_4PFAS.csv')
+
+desired_font<- "Times"
+
+threshold<- -log10(4/14402*0.2)
+
+pfas_mwas <- ggplot() +
+  # Add grey points below the line
+  geom_point(
+    data = subset(full_qg, -log10(p.value) <= threshold), 
+    aes(x = psi, y = -log10(p.value)), 
+    color = "darkgray"
+  ) +
+  # Add red points above the line
+  geom_point(
+    data = subset(full_qg, -log10(p.value) > threshold), 
+    aes(x = psi, y = -log10(p.value)), 
+    color = "red"
+  ) +
+  # Add horizontal line to denote significance threshold
+  geom_hline(
+    yintercept = threshold, 
+    color = "red", 
+    linetype = "dashed"
+  ) +
+  # Add labels and titles
+  labs(
+    x = "Log2-Fold Change in Ion Intensity", 
+    y = "-Log10 (p-value)"  ) +
+  # Apply black and white theme
+  theme_bw() +
+  # Modify theme to remove x-axis grid lines and set font and axis color
+  theme(
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    text = element_text(family = desired_font),
+    axis.text = element_text(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+
+# Print the plot
+print(pfas_mwas)
+```
+
+4 PFAS + MeFOSAA
+
+```{r five_pfas_mwas}
+mefosaa<- read.csv('QG_comp_full_4PFAS_and_ME_PFOSA.csv')
+
+threshold<- -log10(4/14402*0.2)
+
+mefosaa_mwas_plot <- ggplot() +
+  # Add grey points below the line
+  geom_point(
+    data = subset(mefosaa, -log10(p.value) <= threshold), 
+    aes(x = psi, y = -log10(p.value)), 
+    color = "darkgray"
+  ) +
+  # Add red points above the line
+  geom_point(
+    data = subset(mefosaa, -log10(p.value) > threshold), 
+    aes(x = psi, y = -log10(p.value)), 
+    color = "red"
+  ) +
+  # Add horizontal line to denote significance threshold
+  geom_hline(
+    yintercept = threshold, 
+    color = "red", 
+    linetype = "dashed"
+  ) +
+  # Add labels and titles
+  labs(
+    x = "Log2-Fold Change in Ion Intensity", 
+    y = "-Log10 (p-value)", 
+    title = "PFAS Mixture + MeFOSAA MWAS", 
+    subtitle = "In both C18 negative and HILIC positive modes\n3 Features at FDR <0.2" 
+  ) +
+  # Apply black and white theme
+  theme_bw() +
+  # Modify theme to remove x-axis grid lines and set font and axis color
+  theme(
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    text = element_text(family = desired_font),
+    axis.text = element_text(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+
+# Print the plot
+#print(mefosaa_mwas)
+```
+
+Individual PFAS Volcano Plots
+
+PFOA
+5 features less than FDR
+
+```{r}
+pfoa_mwas<- read_csv("PFOA_Full.csv")
+
+threshold<- -log10(5/14402*0.2)
+
+pfoa_mwas_plot <- ggplot() +
+  # Add grey points below the line
+  geom_point(
+    data = subset(pfoa_mwas, -log10(p.value) <=threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "darkgray"
+  ) +
+  # Add red points above the line
+  geom_point(
+    data = subset(pfoa_mwas, -log10(p.value) > threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "red"
+  ) +
+  # Add horizontal line to denote significance threshold
+  geom_hline(
+    yintercept = threshold, 
+    color = "red", 
+    linetype = "dashed"
+  ) +
+  # Add labels and titles
+  labs(
+    x = "Log2-Fold Change in Ion Intensity", 
+    y = "-Log10(p-value)", 
+    title = "a. PFOA"
+  ) +
+  # Apply black and white theme
+  theme_bw() +
+  # Modify theme to remove x-axis grid lines and set font and axis color
+  theme(
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    text = element_text(family = desired_font),
+    axis.text = element_text(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+
+```
+
+PFOS MWAS 
+14 features less than fdr 0.2
+```{r}
+pfos_mwas<- read_csv("PFOS_Full.csv")
+
+threshold<- -log10(14/14402*0.2)
+
+pfos_mwas_plot <- ggplot() +
+  # Add grey points below the line
+  geom_point(
+    data = subset(pfos_mwas, -log10(p.value) <=threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "darkgray"
+  ) +
+  # Add red points above the line
+  geom_point(
+    data = subset(pfos_mwas, -log10(p.value) > threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "red"
+  ) +
+  # Add horizontal line to denote significance threshold
+  geom_hline(
+    yintercept = threshold, 
+    color = "red", 
+    linetype = "dashed"
+  ) +
+  # Add labels and titles
+  labs(
+    x = "Log2-Fold Change in Ion Intensity", 
+    y = "-Log10(p-value)", 
+    title = "d. PFOS"
+  ) +
+  # Apply black and white theme
+  theme_bw() +
+  # Modify theme to remove x-axis grid lines and set font and axis color
+  theme(
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    text = element_text(family = desired_font),
+    axis.text = element_text(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+```
+
+PFNA MWAS 
+
+4 features have FDR less than 0.2
+
+```{r}
+pfna_mwas<- read_csv("PFNA_Full.csv")
+
+threshold<- -log10(4/14402*0.2)
+
+pfna_mwas_plot <- ggplot() +
+  # Add grey points below the line
+  geom_point(
+    data = subset(pfna_mwas, -log10(p.value) <=threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "darkgray"
+  ) +
+  # Add red points above the line
+  geom_point(
+    data = subset(pfna_mwas, -log10(p.value) > threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "red"
+  ) +
+  # Add horizontal line to denote significance threshold
+  geom_hline(
+    yintercept = threshold, 
+    color = "red", 
+    linetype = "dashed"
+  ) +
+  # Add labels and titles
+  labs(
+    x = "Log2-Fold Change in Ion Intensity", 
+    y = "-Log10(p-value)", 
+    title = "b. PFNA"
+  ) +
+  # Apply black and white theme
+  theme_bw() +
+  # Modify theme to remove x-axis grid lines and set font and axis color
+  theme(
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    text = element_text(family = desired_font),
+    axis.text = element_text(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+```
+PFHxS MWAS plot
+3 features at FDR less than .2
+```{r}
+pfhxs_mwas<- read_csv("PFHxS_Full.csv")
+
+threshold<- -log10(3/14402*0.2)
+
+pfhxs_mwas_plot <- ggplot() +
+  # Add grey points below the line
+  geom_point(
+    data = subset(pfhxs_mwas, -log10(p.value) <=threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "darkgray"
+  ) +
+  # Add red points above the line
+  geom_point(
+    data = subset(pfhxs_mwas, -log10(p.value) > threshold), 
+    aes(x = Beta, y = -log10(p.value)), 
+    color = "red"
+  ) +
+  # Add horizontal line to denote significance threshold
+  geom_hline(
+    yintercept = threshold, 
+    color = "red", 
+    linetype = "dashed"
+  ) +
+  # Add labels and titles
+  labs(
+    x = "Log2-Fold Change in Ion Intensity", 
+    y = "-Log10(p-value)", 
+    title = "c. PFHxS"
+  ) +
+  # Apply black and white theme
+  theme_bw() +
+  # Modify theme to remove x-axis grid lines and set font and axis color
+  theme(
+    panel.grid.major.x = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    text = element_text(family = desired_font),
+    axis.text = element_text(colour = "black"),
+    axis.ticks = element_line(colour = "black")
+  )
+```
+
+Compound Plot: use ggpubr to put individual PFAS volcano plots together 
+
+```{r}
+individ_mwas<- ggarrange(pfoa_mwas_plot, pfna_mwas_plot, pfhxs_mwas_plot, pfos_mwas_plot,
+          ncol=2, nrow=2)
+```
+
+**Mummichog output results**
+
+```{r}
+filter_gamma_less_than_0_05 <- function(df) {
+  df_filtered <- df %>%
+    filter(Gamma < 0.05)
+  return(df_filtered)
+}
+```
+
+```{r}
+theme_set(theme_bw(base_size = 12, base_family = "Times New Roman"))
+```
+
+
+```{r}
+#load in mixture data and get it in the right format 
+results<- read.csv("Results/mummi_4pfas_res.csv")
+mummi_for_plot<- filter_gamma_less_than_0_05(results)
+```
+
+Four PFAS bubble plot 
+
+```{r}
+#mixture bubble plot 
+# Plot using ggplot
+four_mummi <- ggplot(mummi_for_plot, aes(y = -log10(Gamma), x = X, size = Hits.sig / Expected)) +
+  geom_point() + 
+  scale_size_continuous(guide = guide_legend(title = "Enrichment Factor")) +
+  labs(y = "-Log10 (p-value)", x = "") +
+  theme(legend.position = "bottom", 
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5), 
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text = element_text(color = "black"),
+        axis.text.y = element_text(size = 14), 
+        axis.text.x = element_text(size = 14, angle = 80, hjust = 1, vjust = 1),  # Rotate x-axis text by 80 degrees
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        legend.box = "vertical")
+```
+
+Individual PFAS
+
+```{r}
+#loading in PFAS data and getting into the right format
+#PFOS 
+pfos_res<- read.csv("Results/mummi_pfos_res.csv")
+pfos_for_plot<- filter_gamma_less_than_0_05(pfos_res)
+
+
+#PFNA
+pfna_res<- read.csv("Results/mummi_pfna_res.csv")
+pfna_for_plot<- filter_gamma_less_than_0_05(pfna_res)
+
+
+#PFHxS
+pfhxs_res<- read.csv("Results/mummi_pfhxs_res.csv")
+pfhxs_for_plot<- filter_gamma_less_than_0_05(pfhxs_res)
+
+#PFOA
+pfoa_res<- read.csv("Results/mummi_pfoa_res.csv")
+pfoa_for_plot<- filter_gamma_less_than_0_05(pfoa_res)
+
+```
+
+```{r}
+theme_set(theme_bw(base_size = 12, base_family = "Times New Roman"))
+
+# Plot using ggplot
+individ_mummi<- ggplot() +
+  geom_point(data = pfoa_for_plot, aes(y = -log10(Gamma), x = X, size = Hits.sig / Expected, 
+                                       color="PFOA")) + #PFOA LAYER
+  geom_point( data= pfna_for_plot, aes(y = -log10(Gamma), x = X, size = Hits.sig / Expected, 
+                                       color= "PFNA"))+ #PFNA LAYER
+  geom_point(data = pfhxs_for_plot, aes(y = -log10(Gamma), x = X, size = Hits.sig / Expected, 
+                                        color= "PFHxS"))+ #PFHxS LAYER
+  geom_point(data = pfos_for_plot, aes(y = -log10(Gamma), x = X, size = Hits.sig / Expected, 
+                                       color="PFOS"))+ #PFOS LAYER
+  scale_size_continuous(guide = guide_legend(title = "Enrichment Factor")) +
+  labs(y = "-Log10 (p-value)", 
+       x= "", 
+       subtitle= "Pathways with Gamma < 0.05",
+       color="Type of PFAS") + #plot labels
+  scale_color_manual(values = c("PFOA" = "#3C8DC4", "PFNA" = "#FF9A3F", 
+                                "PFHxS" = "#942E2E", "PFOS" = "hotpink"), #manually set colors
+                     breaks = c("PFOA", "PFNA", "PFHxS", "PFOS")) + #manually set order of pfas to be consistent 
+  theme(legend.position = "bottom", 
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5), 
+        plot.subtitle = element_text(size = 13, hjust = 0.5),
+        axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(size = 13),
+        axis.text = element_text(color = "black"),
+        axis.text.y = element_text(size = 13), 
+        axis.text.x = element_text(size=11, angle= 75, vjust = 1, hjust=1),
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 13),
+        legend.box = "vertical")
+```
+
+Individual Pathways Venn Diagram 
+
+```{r}
+#creating list for venn diagram 
+mummi_list<- list(
+  PFOA=pfoa_for_plot$X,
+  PFNA= pfna_for_plot$X,
+  PFHxS= pfhxs_for_plot$X,
+  PFOS= pfos_for_plot$X
+)
+
+venn<- ggvenn(
+  mummi_list, 
+  fill_color = c("#3C8DC4", "#FF9A3F", "#942E2E", "hotpink"),
+  stroke_size = 0.5, set_name_size = 4
+  )+
+  labs(title= "Pathways Associated with Each PFAS in the Mixture",
+       subtitle = "Pathways with Gamma < 0.05")+
+  theme(
+    plot.title = element_text(family = "Times", size = 14, face = "bold", hjust = 0.5), 
+    plot.subtitle = element_text(famil= "Times", size= 12, hjust= 0.5)
+  )
+```
+
+5 PFAS MIXTURE BUBBLE PLOT
+
+```{r}
+five_res<-  read.csv("Results/mummi_five_res.csv")
+five_for_plot<- filter_gamma_less_than_0_05(five_res)
+
+five_mummi <- ggplot(five_for_plot, aes(y = -log10(Gamma), x = X, size = Hits.sig / Expected)) +
+  geom_point() + 
+  scale_size_continuous(guide = guide_legend(title = "Enrichment Factor")) +
+  labs(y = "-Log10 (p-value)", x = "", title= "Pathways Associated With Five PFAS Mixture") +
+  theme(legend.position = "bottom", 
+        plot.title = element_text(face = "bold", size = 14, hjust = 0.5), 
+        plot.subtitle = element_text(size = 14, hjust = 0.5),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14),
+        axis.text = element_text(color = "black"),
+        axis.text.y = element_text(size = 14), 
+        axis.text.x = element_text(size = 14, angle = 80, hjust = 1, vjust = 1),  # Rotate x-axis text by 80 degrees
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        legend.box = "vertical")
+
+```
+
+
+PFAS Heatmap 
+
+```{r}
+# Renaming the column "ME-PFOSA-ACOH2" to "MeFOSAA"
+names(pfas)[names(pfas) == "ME-PFOSA-ACOH2"] <- "MeFOSAA"
+names(pfas)[names(pfas) == "PFHXS"] <- "PFHxS"
+
+
+# Selecting specific columns
+cor_cols <- pfas %>%
+  select(PFOA, PFNA, PFHxS, PFOS, MeFOSAA)
+
+# Calculating correlation matrix and rounding off the values
+cormat <- round(cor(cor_cols), 2)
+
+# Function to get lower triangle of correlation matrix
+get_lower_tri <- function(cormat) {
+  cormat[lower.tri(cormat)] <- NA
+  return(cormat)
+}
+
+# Applying the function to the correlation matrix
+cormat <- get_lower_tri(cormat)
+
+# Melting the correlation matrix and removing NA values
+melted_cormat <- melt(cormat, na.rm = TRUE)
+melted_cormat$value <- as.numeric(melted_cormat$value)  # Convert 'value' to numeric
+
+spearman_cor <- ggplot(data = melted_cormat, aes(Var2, Var1, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                      midpoint = 0, limit = c(-1, 1), space = "Lab", 
+                      name = "Spearman\nCorrelation") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 12, hjust = 1, family = "Times New Roman"), 
+        axis.text.y = element_text(family = "Times New Roman"), 
+        axis.title.x = element_blank(),  # Set axis title x to blank
+        axis.title.y = element_blank(),  # Set axis title y to blank
+        legend.text = element_text(family = "Times New Roman"), 
+        legend.title = element_text(family = "Times New Roman"), 
+        panel.grid.major = element_blank(), 
+        panel.border = element_blank(), 
+        panel.background = element_blank(), 
+        axis.ticks = element_blank(), 
+        legend.justification = c(1, 0), 
+        legend.position = c(0.4, 0.7), 
+        legend.direction = "horizontal") +
+  coord_fixed() + 
+  geom_text(aes(Var2, Var1, label = value), color = "black", size = 4, family = "Times New Roman") +
+  guides(fill = guide_colorbar(barwidth = 7, barheight = 1, 
+                               title.position = "top", title.hjust = 0.5)) +
+  scale_y_reverse()
+
+spearman_cor
+
+```
+
+
+
+
