@@ -7,4 +7,6 @@ This repository contains the following:
 2. A pdf file of the rendered Rmarkdown file.
 3. An html file of the R markdown file.
 
-For more information visit: https://raw.githack.com/AmberHall/HOME-Prenatal-PFAS-Cord-Metabolomics/main/Serum-PFAS-and-Cord-Metabolomics.html
+This study used data from the HOME Study. This data is not publically available; however, data can be requested here: https://homestudy.research.cchmc.org/contact
+
+For more information regarding the workflow for this study visit: https://raw.githack.com/AmberHall/HOME-Prenatal-PFAS-Cord-Metabolomics/main/Serum-PFAS-and-Cord-Metabolomics.html
