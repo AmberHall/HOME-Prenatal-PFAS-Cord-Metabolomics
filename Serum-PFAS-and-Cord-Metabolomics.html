@@ -364,16 +364,17 @@ display: none;
 <p>This code was written for the paper “Associations of a Prenatal Serum
 Per- and Polyfluoroalkyl Substance Mixture with the Cord Serum
 Metabolome in the HOME Study” by Hall et al. Details for this study can
-be found here (<strong>Paper under review</strong>). In brief, the
-purpose of this research was to evaluate associations between a mixture
-of 4 PFAS [perfluorooctanesulfonic acid (PFOS), perfluorooctanoic acid
-(PFOA), perfluorohexanesulfonic acid (PFHxS), and perfluorononanoic acid
-(PFNA)] measured at 16 weeks’ gestation and cord serum metabolites. The
-metabolites were identified using an untargeted analysis approach.
-Additionally, we examined each PFAS individually and included
-<em>N</em>-methylperfluorooctane sulfonamido acetic acid (MeFOSAA) in
-the mixture analysis to gain insight into their potential influence on
-the mixture in secondary and sensitivity analyses, respectively.</p>
+be found here <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515">(Hall et
+al.)</a>. In brief, the purpose of this research was to evaluate
+associations between a mixture of 4 PFAS [perfluorooctanesulfonic acid
+(PFOS), perfluorooctanoic acid (PFOA), perfluorohexanesulfonic acid
+(PFHxS), and perfluorononanoic acid (PFNA)] measured at 16 weeks’
+gestation and cord serum metabolites. The metabolites were identified
+using an untargeted analysis approach. Additionally, we examined each
+PFAS individually and included <em>N</em>-methylperfluorooctane
+sulfonamido acetic acid (MeFOSAA) in the mixture analysis to gain
+insight into their potential influence on the mixture in secondary and
+sensitivity analyses, respectively.</p>
 <p>The code provided here is the corresponding code for our analyses.
 Functions performed using this code can be seen in the box below.</p>
 <div style="border: 1px solid #000; padding: 10px; background-color: #F8BBD0">
@@ -818,11 +819,11 @@ Github)</a>
 <div id="mwas-for-the-4-pfas-mixture-quantile-based-g-computation" class="section level3">
 <h3>2.1. MWAS for the 4-PFAS Mixture (Quantile-Based g-Computation)</h3>
 <p>This chunk of code is the primary Metabolome Wide Association Study
-(MWAS) analysis for our study <strong>(study under review)</strong>. We
-evaluated whether the joint effect of our 4 PFAS of interest (PFOS,
-PFOA, PFHxS, PFNA) were associated with the ion abundance for each
-feature, adjusting for parity, family income, maternal age, maternal
-race, and cotinine concentrations.</p>
+(MWAS) analysis for our study <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515">(Hall et
+al.)</a>. We evaluated whether the joint effect of our 4 PFAS of
+interest (PFOS, PFOA, PFHxS, PFNA) were associated with the ion
+abundance for each feature, adjusting for parity, family income,
+maternal age, maternal race, and cotinine concentrations.</p>
 <p>The results of these models are outputted to 3 files, detailed in the
 box below.</p>
 <div style="border: 1px solid #000; padding: 10px">
@@ -1217,15 +1218,16 @@ add.vec &lt;- c(&quot;M+FA-H [1-]&quot;,&quot;M-H [1-]&quot;,&quot;2M-H [1-]&quo
 conducted a <em>mummichog</em> PEA to identify enriched pathways using
 MetaboAnalystR.</p>
 <p>Details regarding our untargeted analysis are described in detail in
-our paper (<strong>paper under review</strong>). From this information,
-we restricted to adducts that could potentially form based on our mobile
-phases and internal standards (the specific adducts used in our analyses
-are detailed in the box below). This PEA was conducted using the human
-MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value
-cutoff &lt;0.05 to delineate between significantly enriched and
-non-significantly enriched features. Furthermore, this analysis was
-restricted to metabolite data sets containing at least 3 entries. A
-p(gamma) &lt; 0.05 was considered statistically significant.<br />
+our paper <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515">(Hall et
+al.)</a>. From this information, we restricted to adducts that could
+potentially form based on our mobile phases and internal standards (the
+specific adducts used in our analyses are detailed in the box below).
+This PEA was conducted using the human MFN network, a mass tolerance of
+5ppm, 10,000 permutations and a p-value cutoff &lt;0.05 to delineate
+between significantly enriched and non-significantly enriched features.
+Furthermore, this analysis was restricted to metabolite data sets
+containing at least 3 entries. A p(gamma) &lt; 0.05 was considered
+statistically significant.<br />
 <br></p>
 <div style="border: 1px solid #000; padding: 10px; text-align: center">
 <h5 style="text-align: center">
@@ -1303,15 +1305,16 @@ pathways using MetaboAnalystR. This was part of a secondary analysis
 that evaluated the impact of individual PFAS on the PEA of the 4-PFAS
 mixture (this is discussed in Section 3.2).</p>
 <p>Details regarding our untargeted analysis are described in detail in
-our paper (<strong>paper under review</strong>). From this, we
-restricted to adducts that could potentially form based on our mobile
-phases and internal standards (the specific adducts used in our analyses
-are detailed in the box below). This PEA was conducted using the human
-MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value
-cutoff &lt;0.05 to delineate between significantly enriched and
-non-significantly enriched features. Furthermore, this analysis was
-restricted to metabolite data sets containing at least 3 entries. A
-p(gamma) &lt; 0.05 was considered statistically significant.</p>
+our paper <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515">(Hall et
+al.)</a>. From this, we restricted to adducts that could potentially
+form based on our mobile phases and internal standards (the specific
+adducts used in our analyses are detailed in the box below). This PEA
+was conducted using the human MFN network, a mass tolerance of 5ppm,
+10,000 permutations and a p-value cutoff &lt;0.05 to delineate between
+significantly enriched and non-significantly enriched features.
+Furthermore, this analysis was restricted to metabolite data sets
+containing at least 3 entries. A p(gamma) &lt; 0.05 was considered
+statistically significant.</p>
 <div style="border: 1px solid #000; padding: 10px; text-align: center;">
 <p>
 <strong>Adducts We Restricted to in Our Analyses</strong>
@@ -1384,15 +1387,16 @@ MetaboAnalystR. This was a sensitivity analysis to determine the impact
 of MeFOSAA on the PEA of our 4-PFAS mixture (this is discussed in
 Section 3.2).</p>
 <p>Details regarding our untargeted analysis are described in detail in
-our paper (<strong>paper under review</strong>). From this information,
-we restricted to adducts that could potentially form based on our mobile
-phases and internal standards (the specific adducts used in our analyses
-are detailed in the box below). This PEA was conducted using the human
-MFN network, a mass tolerance of 5ppm, 10,000 permutations and a p-value
-cutoff &lt;0.05 to delineate between significantly enriched and
-non-significantly enriched features. Furthermore, this analysis was
-restricted to metabolite data sets containing at least 3 entries. A
-p(gamma) &lt; 0.05 was considered statistically significant.</p>
+our paper <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c07515">(Hall et
+al.)</a>. From this information, we restricted to adducts that could
+potentially form based on our mobile phases and internal standards (the
+specific adducts used in our analyses are detailed in the box below).
+This PEA was conducted using the human MFN network, a mass tolerance of
+5ppm, 10,000 permutations and a p-value cutoff &lt;0.05 to delineate
+between significantly enriched and non-significantly enriched features.
+Furthermore, this analysis was restricted to metabolite data sets
+containing at least 3 entries. A p(gamma) &lt; 0.05 was considered
+statistically significant.</p>
 <div style="border: 1px solid #000; padding: 10px; text-align: center;">
 <p>
 <strong>Adducts We Restricted to in Our Analyses</strong>
