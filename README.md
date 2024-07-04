@@ -1,6 +1,6 @@
 # HOME-Prenatal-PFAS-Cord-Metabolomics
 
-This is the code to accompany my paper, "Associations of a Prenatal Serum Per- and Polyfluoroalkyl Substance Mixture with the Cord Serum Metabolome in the HOME Study".
+This is the code to accompany my paper: Hall, Amber M., et al. "Associations of a Prenatal Serum Per-and Polyfluoroalkyl Substance Mixture with the Cord Serum Metabolome in the HOME Study." Environmental science & technology 57.51 (2023): 21627-21636.
 
 This repository contains the following:
 1. An R markdown file with the original code. This file contains the R code the analysis was run in as well as explainations with html code for readability when rendered.
